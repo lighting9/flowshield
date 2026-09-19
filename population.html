@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VECTOR - Population Impact Analysis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 font-sans min-h-screen flex flex-col">
+
+    <!-- Top Navigation Bar -->
+    <header class="bg-slate-800 border-b border-slate-700 px-6 py-3 flex flex-wrap justify-between items-center shadow-md gap-4">
+        <h1 class="text-xl font-black tracking-wider text-cyan-400 flex items-center gap-2">
+            <span>🌊</span> VECTOR <span class="text-[10px] bg-cyan-900 text-cyan-300 px-2 py-0.5 rounded uppercase tracking-widest">Demographic Risk</span>
+        </h1>
+        <nav class="flex flex-wrap gap-2 text-xs font-semibold">
+            <a href="index.html" class="bg-slate-700 hover:bg-slate-600 text-slate-300 px-3 py-1.5 rounded-lg transition">Dashboard</a>
+            <a href="scenarios.html" class="bg-slate-700 hover:bg-slate-600 text-slate-300 px-3 py-1.5 rounded-lg transition">Scenarios</a>
+            <a href="timeline.html" class="bg-slate-700 hover:bg-slate-600 text-slate-300 px-3 py-1.5 rounded-lg transition">Time Slider</a>
+            <a href="comparison.html" class="bg-slate-700 hover:bg-slate-600 text-slate-300 px-3 py-1.5 rounded-lg transition">Comparison</a>
+            <a href="population.html" class="bg-cyan-600 text-white px-3 py-1.5 rounded-lg shadow">Population Risk</a>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-6 max-w-5xl mx-auto w-full">
+        <h2 class="text-2xl font-bold text-slate-100 mb-2">👥 Estimated Affected Population & Risk Analytics</h2>
+        <p class="text-sm text-slate-400 mb-6">Real-time estimation of residents residing in regional flood zones based on current water accumulation and elevation metrics.</p>
+
+        <!-- Metric Summary Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-slate-800 border border-slate-700 p-5 rounded-xl shadow-lg">
+                <span class="text-xs text-slate-400 uppercase font-bold tracking-wide">Total City Population</span>
+                <p class="text-3xl font-black text-cyan-400 mt-2 font-mono">48,500</p>
+                <span class="text-xs text-slate-500 mt-1 block">Across 5 mapped regional zones</span>
+            </div>
+            <div class="bg-slate-800 border border-red-500/40 p-5 rounded-xl shadow-lg">
+                <span class="text-xs text-red-400 uppercase font-bold tracking-wide">High Risk / Critical Residents</span>
+                <p id="high-risk-count" class="text-3xl font-black text-red-400 mt-2 font-mono">14,500</p>
+                <span class="text-xs text-slate-400 mt-1 block">Zones exceeding 100% capacity</span>
+            </div>
+            <div class="bg-slate-800 border border-amber-500/40 p-5 rounded-xl shadow-lg">
+                <span class="text-xs text-amber-400 uppercase font-bold tracking-wide">Warning Zone Residents</span>
+                <p id="warning-risk-count" class="text-3xl font-black text-amber-400 mt-2 font-mono">18,200</p>
+                <span class="text-xs text-slate-400 mt-1 block">Zones at 70% – 99% capacity</span>
+            </div>
+        </div>
+
+        <!-- Regional Demographic Breakdown Table -->
+        <div class="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden shadow-lg">
+            <div class="px-5 py-4 bg-slate-800 border-b border-slate-700 font-bold text-sm text-slate-200">
+                📊 Regional Population & Vulnerability Breakdown
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead>
+                        <tr class="bg-slate-900/60 text-slate-400 text-xs uppercase tracking-wider border-b border-slate-700">
+                            <th class="p-4">Region Name</th>
+                            <th class="p-4">Resident Population</th>
+                            <th class="p-4">Elevation</th>
+                            <th class="p-4">Current Status</th>
+                            <th class="p-4">Vulnerability Level</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-700/50 text-xs">
+                        <tr class="hover:bg-slate-700/30 transition">
+                            <td class="p-4 font-bold text-white">North Hills (R1)</td>
+                            <td class="p-4 font-mono text-slate-300">6,500</td>
+                            <td class="p-4 font-mono text-cyan-300">50.0m</td>
+                            <td class="p-4"><span class="px-2.5 py-1 rounded font-semibold bg-emerald-500/20 text-emerald-300">Safe</span></td>
+                            <td class="p-4 text-emerald-400 font-medium">Low Risk</td>
+                        </tr>
+                        <tr class="hover:bg-slate-700/30 transition">
+                            <td class="p-4 font-bold text-white">Central Market (R2)</td>
+                            <td class="p-4 font-mono text-slate-300">18,200</td>
+                            <td class="p-4 font-mono text-cyan-300">22.0m</td>
+                            <td class="p-4"><span class="px-2.5 py-1 rounded font-semibold bg-amber-500/20 text-amber-300">Warning</span></td>
+                            <td class="p-4 text-amber-400 font-medium">Moderate Vulnerability</td>
+                        </tr>
+                        <tr class="hover:bg-slate-700/30 transition">
+                            <td class="p-4 font-bold text-white">Lowland Valley (R3)</td>
+                            <td class="p-4 font-mono text-slate-300">9,300</td>
+                            <td class="p-4 font-mono text-cyan-300">6.0m</td>
+                            <td class="p-4"><span class="px-2.5 py-1 rounded font-semibold bg-red-500/20 text-red-300 animate-pulse">Critical</span></td>
+                            <td class="p-4 text-red-400 font-medium">High Emergency Priority</td>
+                        </tr>
+                        <tr class="hover:bg-slate-700/30 transition">
+                            <td class="p-4 font-bold text-white">East Industrial (R4)</td>
+                            <td class="p-4 font-mono text-slate-300">8,500</td>
+                            <td class="p-4 font-mono text-cyan-300">28.0m</td>
+                            <td class="p-4"><span class="px-2.5 py-1 rounded font-semibold bg-emerald-500/20 text-emerald-300">Safe</span></td>
+                            <td class="p-4 text-emerald-400 font-medium">Low Risk</td>
+                        </tr>
+                        <tr class="hover:bg-slate-700/30 transition">
+                            <td class="p-4 font-bold text-white">Riverside Basin (R5)</td>
+                            <td class="p-4 font-mono text-slate-300">6,000</td>
+                            <td class="p-4 font-mono text-cyan-300">2.0m</td>
+                            <td class="p-4"><span class="px-2.5 py-1 rounded font-semibold bg-red-500/20 text-red-300 animate-pulse">Critical</span></td>
+                            <td class="p-4 text-red-400 font-medium">High Emergency Priority</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
