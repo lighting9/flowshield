@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VECTOR - Scenario Simulation Suite</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 font-sans min-h-screen flex flex-col">
+
+    <header class="bg-slate-800 border-b border-slate-700 px-6 py-3 flex flex-wrap justify-between items-center shadow-md gap-4">
+        <h1 class="text-xl font-black tracking-wider text-cyan-400 flex items-center gap-2">
+            <span>🌊</span> VECTOR <span class="text-[10px] bg-cyan-900 text-cyan-300 px-2 py-0.5 rounded uppercase tracking-widest">Scenario Suite</span>
+        </h1>
+        <nav class="flex flex-wrap gap-2 text-xs font-semibold">
+            <a href="index.html" class="bg-slate-700 hover:bg-slate-600 text-slate-300 px-3 py-1.5 rounded-lg transition">Dashboard</a>
+            <a href="scenarios.html" class="bg-cyan-600 text-white px-3 py-1.5 rounded-lg shadow">Scenarios</a>
+            <a href="timeline.html" class="bg-slate-700 hover:bg-slate-600 text-slate-300 px-3 py-1.5 rounded-lg transition">Time Slider</a>
+            <a href="comparison.html" class="bg-slate-700 hover:bg-slate-600 text-slate-300 px-3 py-1.5 rounded-lg transition">Comparison</a>
+            <a href="population.html" class="bg-slate-700 hover:bg-slate-600 text-slate-300 px-3 py-1.5 rounded-lg transition">Population Risk</a>
+        </nav>
+    </header>
+
+    <main class="flex-1 p-6 max-w-5xl mx-auto w-full">
+        <h2 class="text-2xl font-bold text-slate-100 mb-2">🧪 Preset Disaster Scenario Testing</h2>
+        <p class="text-sm text-slate-400 mb-6">Select a preset scenario to instantly load specific rainfall intensities, drainage malfunctions, or blocked channel conditions.</p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <!-- Scenario 1 -->
+            <div onclick="loadScenario('normal')" class="bg-slate-800 border border-slate-700 hover:border-cyan-500 p-5 rounded-xl cursor-pointer transition shadow-lg">
+                <span class="text-xs bg-emerald-500/20 text-emerald-300 px-2.5 py-1 rounded font-bold">Scenario A</span>
+                <h3 class="text-lg font-bold text-white mt-3">Normal Rainfall Conditions</h3>
+                <p class="text-xs text-slate-400 mt-1">Rainfall at 2.0 mm/hr. Regional drainage capacity easily handles the inflow with zero overflow risks.</p>
+            </div>
+            <!-- Scenario 2 -->
+            <div onclick="loadScenario('heavy')" class="bg-slate-800 border border-slate-700 hover:border-red-500 p-5 rounded-xl cursor-pointer transition shadow-lg">
+                <span class="text-xs bg-red-500/20 text-red-300 px-2.5 py-1 rounded font-bold">Scenario B</span>
+                <h3 class="text-lg font-bold text-white mt-3">Heavy Rainfall Storm</h3>
+                <p class="text-xs text-slate-400 mt-1">Cloudburst intensity at 8.5 mm/hr. Lowland and riverside basins rapidly approach critical thresholds.</p>
+            </div>
+            <!-- Scenario 3 -->
+            <div onclick="loadScenario('failure')" class="bg-slate-800 border border-slate-700 hover:border-amber-500 p-5 rounded-xl cursor-pointer transition shadow-lg">
+                <span class="text-xs bg-amber-500/20 text-amber-300 px-2.5 py-1 rounded font-bold">Scenario C</span>
+                <h3 class="text-lg font-bold text-white mt-3">Total Drainage Failure</h3>
+                <p class="text-xs text-slate-400 mt-1">City-wide power outage disables all automated pumping stations (Drainage capacity reduced to 0.1 mm/step).</p>
+            </div>
+            <!-- Scenario 4 -->
+            <div onclick="loadScenario('blocked')" class="bg-slate-800 border border-slate-700 hover:border-purple-500 p-5 rounded-xl cursor-pointer transition shadow-lg">
+                <span class="text-xs bg-purple-500/20 text-purple-300 px-2.5 py-1 rounded font-bold">Scenario D</span>
+                <h3 class="text-lg font-bold text-white mt-3">Blocked Drainage Channel</h3>
+                <p class="text-xs text-slate-400 mt-1">Debris blockage clogs the main conduit from Central Market to Lowland Valley, halting runoff transfer.</p>
+            </div>
+        </div>
+
+        <!-- Scenario Output Display -->
+        <div id="scenario-output" class="bg-slate-800 border border-slate-700 p-6 rounded-xl shadow-lg">
+            <h3 class="text-sm font-bold text-cyan-300 uppercase tracking-wide mb-2">📋 Active Scenario Simulation Report</h3>
+            <p id="scenario-desc" class="text-sm text-slate-300">Click any scenario above to execute the preset hydrological model.</p>
+        </div>
+    </main>
+
+    <script>
+        function loadScenario(type) {
+            const output = document.getElementById('scenario-desc');
+            if (type === 'normal') {
+                output.innerHTML = `<b class="text-emerald-400">Normal Rainfall Loaded:</b> Rainfall = 2.0 mm/hr. Drainage operational at 100%. All 5 regions classified as <span class="text-emerald-300 font-bold">SAFE</span>. Estimated affected population: 0.`;
+            } else if (type === 'heavy') {
+                output.innerHTML = `<b class="text-red-400">Heavy Storm Loaded:</b> Rainfall = 8.5 mm/hr. Lowland Valley & Riverside Basin reach <span class="text-red-300 font-bold">CRITICAL</span> overflow within 3 time steps. Estimated affected population: 14,500.`;
+            } else if (type === 'failure') {
+                output.innerHTML = `<b class="text-amber-400">Drainage Failure Loaded:</b> Pumping stations offline. Water accumulation accelerated by 300%. Central Market and Lowland Valley at risk. Estimated affected population: 22,100.`;
+            } else if (type === 'blocked') {
+                output.innerHTML = `<b class="text-purple-400">Blocked Channel Loaded:</b> Conduit R2➔R3 severed. Upstream pooling in Central Market while Lowland Valley starves of runoff. Estimated affected population: 8,400.`;
+            }
+        }
+    </script>
+</body>
+</html>
