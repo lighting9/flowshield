@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VECTOR - Disaster Intelligence Dashboard</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Leaflet CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 font-sans min-h-screen flex flex-col">
+
+    <!-- Top Navigation Bar linking Bonus Pages -->
+    <header class="bg-slate-800 border-b border-slate-700 px-6 py-3 flex flex-wrap justify-between items-center shadow-md gap-4">
+        <h1 class="text-xl font-black tracking-wider text-cyan-400 flex items-center gap-2">
+            <span>🌊</span> VECTOR <span class="text-[10px] bg-cyan-900 text-cyan-300 px-2 py-0.5 rounded uppercase tracking-widest">Core Engine</span>
+        </h1>
+        <nav class="flex flex-wrap gap-2 text-xs font-semibold">
+            <a href="index.html" class="bg-cyan-600 text-white px-3 py-1.5 rounded-lg shadow">Dashboard</a>
+            <a href="scenarios.html" class="bg-slate-700 hover:bg-slate-600 text-slate-300 px-3 py-1.5 rounded-lg transition">Scenarios</a>
+            <a href="timeline.html" class="bg-slate-700 hover:bg-slate-600 text-slate-300 px-3 py-1.5 rounded-lg transition">Time Slider</a>
+            <a href="comparison.html" class="bg-slate-700 hover:bg-slate-600 text-slate-300 px-3 py-1.5 rounded-lg transition">Comparison</a>
+            <a href="population.html" class="bg-slate-700 hover:bg-slate-600 text-slate-300 px-3 py-1.5 rounded-lg transition">Population Risk</a>
+        </nav>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="flex-1 p-6 grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl mx-auto w-full">
+        <!-- Left Controls -->
+        <div class="flex flex-col gap-6">
+            <div class="bg-slate-800 border border-slate-700 p-5 rounded-xl shadow-lg">
+                <h2 class="text-lg font-bold text-slate-200 mb-4 flex items-center gap-2"><span>⚙️</span> Simulation Controls</h2>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-slate-300 mb-2">Rainfall Intensity: <span id="rainfall-val" class="text-cyan-400 font-bold">4.0</span> mm/hr</label>
+                    <input type="range" id="rainfall-slider" min="0.0" max="10.0" step="0.5" value="4.0" class="w-full accent-cyan-500 cursor-pointer">
+                </div>
+                <div class="flex gap-3 mt-4">
+                    <button id="btn-step" class="flex-1 bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2 px-4 rounded-lg shadow transition">Simulate Step</button>
+                    <button id="btn-reset" class="bg-slate-700 hover:bg-slate-600 text-slate-300 font-semibold py-2 px-4 rounded-lg shadow transition">Reset</button>
+                </div>
+            </div>
+            <div class="bg-slate-800 border border-red-500/40 p-4 rounded-xl shadow-lg flex-1">
+                <h3 class="text-sm font-bold text-red-400 uppercase tracking-wide mb-2">🚨 Critical Alerts</h3>
+                <div id="critical-spotlight" class="text-xs text-slate-300 space-y-1">
+                    <span class="text-emerald-400 font-medium">✓ All regional nodes operating within safe limits.</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Center / Right Panel -->
+        <div class="lg:col-span-2 flex flex-col gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Spatial Map -->
+                <div class="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden shadow-lg flex flex-col h-[280px]">
+                    <div class="px-4 py-2 bg-slate-800 border-b border-slate-700 text-xs font-bold text-slate-200">🗺️ Spatial Grid Map (OpenStreetMap)</div>
+                    <div id="map" class="flex-1 w-full z-10"></div>
+                </div>
+                <!-- Water Progression Chart -->
+                <div class="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden shadow-lg flex flex-col h-[280px] p-4">
+                    <div class="text-xs font-bold text-slate-200 mb-2">📈 Water Level Progression (Valley Node)</div>
+                    <div class="flex-1 relative w-full h-full">
+                        <canvas id="predictionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <!-- Regional Status Matrix -->
+            <div class="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden shadow-lg flex-1 p-4">
+                <h3 class="text-sm font-bold text-slate-200 mb-3">📊 Regional Status Matrix</h3>
+                <div id="summary-table" class="text-xs text-slate-300">
+                    Core simulation engine running. Current baseline stable. Use top navigation to test scenarios, time scrubbing, and population risks.
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Script to Initialize Map and Chart -->
+    <script>
+        // 1. Initialize OpenStreetMap (Free, No API Key, No Watermark)
+        const map = L.map('map').setView([12.9716, 77.5946], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        L.circleMarker([12.9730, 77.5966], {
+            radius: 10, 
+            color: '#22d3ee', 
+            fillColor: '#22d3ee', 
+            fillOpacity: 0.8
+        }).addTo(map).bindPopup("Lowland Valley Node R3");
+
+        // 2. Initialize Chart.js Graph
+        const ctx = document.getElementById('predictionChart').getContext('2d');
+        const predictionChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['T0', 'T1', 'T2', 'T3', 'T4', 'T5'],
+                datasets: [{
+                    label: 'Water Level (m)',
+                    data: [2.1, 3.5, 4.2, 5.8, 7.1, 8.4],
+                    borderColor: '#22d3ee',
+                    backgroundColor: 'rgba(34, 211, 238, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    x: {
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                        ticks: { color: '#94a3b8', font: { size: 10 } }
+                    },
+                    y: {
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                        ticks: { color: '#94a3b8', font: { size: 10 } },
+                        max: 15
+                    }
+                }
+            }
+        });
+
+        // 3. Slider and Button interactivity
+        const slider = document.getElementById('rainfall-slider');
+        const rainfallVal = document.getElementById('rainfall-val');
+        const btnStep = document.getElementById('btn-step');
+
+        slider.addEventListener('input', (e) => {
+            rainfallVal.innerText = e.target.value;
+        });
+
+        btnStep.addEventListener('click', () => {
+            // Simulate a step by bumping chart data points slightly based on slider intensity
+            const intensity = parseFloat(slider.value);
+            const lastVal = predictionChart.data.datasets[0].data.slice(-1)[0];
+            const nextVal = Math.min(15, parseFloat((lastVal + (intensity * 0.2)).toFixed(1)));
+            
+            // Shift labels and data
+            predictionChart.data.labels.push('T' + predictionChart.data.labels.length);
+            predictionChart.data.datasets[0].data.push(nextVal);
+            predictionChart.update();
+
+            if (nextVal >= 12) {
+                document.getElementById('critical-spotlight').innerHTML = `<span class="text-red-400 font-bold animate-pulse">⚠ CRITICAL OVERFLOW at Lowland Valley! Water level reached ${nextVal}m.</span>`;
+            }
+        });
+
+        document.getElementById('btn-reset').addEventListener('click', () => {
+            predictionChart.data.labels = ['T0', 'T1', 'T2', 'T3', 'T4', 'T5'];
+            predictionChart.data.datasets[0].data = [2.1, 3.5, 4.2, 5.8, 7.1, 8.4];
+            predictionChart.update();
+            document.getElementById('critical-spotlight').innerHTML = `<span class="text-emerald-400 font-medium">✓ All regional nodes operating within safe limits.</span>`;
+        });
+    </script>
+</body>
+</html>
