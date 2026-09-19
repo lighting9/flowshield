@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VECTOR - Scenario Behavior Comparison</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 font-sans min-h-screen flex flex-col">
+
+    <!-- Top Navigation Bar -->
+    <header class="bg-slate-800 border-b border-slate-700 px-6 py-3 flex flex-wrap justify-between items-center shadow-md gap-4">
+        <h1 class="text-xl font-black tracking-wider text-cyan-400 flex items-center gap-2">
+            <span>🌊</span> VECTOR <span class="text-[10px] bg-cyan-900 text-cyan-300 px-2 py-0.5 rounded uppercase tracking-widest">Comparison Matrix</span>
+        </h1>
+        <nav class="flex flex-wrap gap-2 text-xs font-semibold">
+            <a href="index.html" class="bg-slate-700 hover:bg-slate-600 text-slate-300 px-3 py-1.5 rounded-lg transition">Dashboard</a>
+            <a href="scenarios.html" class="bg-slate-700 hover:bg-slate-600 text-slate-300 px-3 py-1.5 rounded-lg transition">Scenarios</a>
+            <a href="timeline.html" class="bg-slate-700 hover:bg-slate-600 text-slate-300 px-3 py-1.5 rounded-lg transition">Time Slider</a>
+            <a href="comparison.html" class="bg-cyan-600 text-white px-3 py-1.5 rounded-lg shadow">Comparison</a>
+            <a href="population.html" class="bg-slate-700 hover:bg-slate-600 text-slate-300 px-3 py-1.5 rounded-lg transition">Population Risk</a>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-6 max-w-6xl mx-auto w-full">
+        <h2 class="text-2xl font-bold text-slate-100 mb-2">⚖️ Scenario Behavior Comparison Matrix</h2>
+        <p class="text-sm text-slate-400 mb-6">Compare hydrological response metrics, peak water accumulation speeds, and drainage efficacy across different environmental presets.</p>
+
+        <div class="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden shadow-lg">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead>
+                        <tr class="bg-slate-900/60 text-slate-400 text-xs uppercase tracking-wider border-b border-slate-700">
+                            <th class="p-4">Simulation Scenario</th>
+                            <th class="p-4">Rainfall Intensity</th>
+                            <th class="p-4">Drainage Status</th>
+                            <th class="p-4">Peak Water Level (Valley)</th>
+                            <th class="p-4">Time to Critical</th>
+                            <th class="p-4">Overall Risk Level</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-700/50 text-xs">
+                        <tr class="hover:bg-slate-700/30 transition">
+                            <td class="p-4 font-bold text-white">Scenario A: Normal Rainfall</td>
+                            <td class="p-4 font-mono text-cyan-300">2.0 mm/hr</td>
+                            <td class="p-4 text-emerald-400">100% Operational</td>
+                            <td class="p-4 font-mono">4.2m / 15.0m</td>
+                            <td class="p-4 font-mono text-slate-400">Never (Stable)</td>
+                            <td class="p-4"><span class="px-2.5 py-1 rounded font-semibold bg-emerald-500/20 text-emerald-300">Safe</span></td>
+                        </tr>
+                        <tr class="hover:bg-slate-700/30 transition">
+                            <td class="p-4 font-bold text-white">Scenario B: Heavy Storm</td>
+                            <td class="p-4 font-mono text-cyan-300">8.5 mm/hr</td>
+                            <td class="p-4 text-emerald-400">100% Operational</td>
+                            <td class="p-4 font-mono text-red-400 font-bold">15.0m / 15.0m (Overflow)</td>
+                            <td class="p-4 font-mono text-red-400">~3 Steps</td>
+                            <td class="p-4"><span class="px-2.5 py-1 rounded font-semibold bg-red-500/20 text-red-300 animate-pulse">Critical</span></td>
+                        </tr>
+                        <tr class="hover:bg-slate-700/30 transition">
+                            <td class="p-4 font-bold text-white">Scenario C: Drainage Failure</td>
+                            <td class="p-4 font-mono text-cyan-300">4.0 mm/hr</td>
+                            <td class="p-4 text-red-400">Failure (0.1 mm/step)</td>
+                            <td class="p-4 font-mono text-red-400 font-bold">15.0m / 15.0m (Overflow)</td>
+                            <td class="p-4 font-mono text-amber-400">~5 Steps</td>
+                            <td class="p-4"><span class="px-2.5 py-1 rounded font-semibold bg-amber-500/20 text-amber-300">Warning / Critical</span></td>
+                        </tr>
+                        <tr class="hover:bg-slate-700/30 transition">
+                            <td class="p-4 font-bold text-white">Scenario D: Blocked Channel</td>
+                            <td class="p-4 font-mono text-cyan-300">4.0 mm/hr</td>
+                            <td class="p-4 text-purple-300">Conduit R2➔R3 Blocked</td>
+                            <td class="p-4 font-mono">11.8m / 15.0m</td>
+                            <td class="p-4 font-mono text-cyan-300">~8 Steps</td>
+                            <td class="p-4"><span class="px-2.5 py-1 rounded font-semibold bg-amber-500/20 text-amber-300">Warning</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
