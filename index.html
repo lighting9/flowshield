@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VECTOR - AI Flood Prediction & Early Warning Dashboard</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Leaflet CSS & JS for Mapping -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Chart.js for the Prediction Graph -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 font-sans min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-slate-800 border-b border-slate-700 px-6 py-4 flex justify-between items-center shadow-md">
+        <div>
+            <h1 class="text-2xl font-black tracking-wider text-cyan-400 flex items-center gap-2">
+                <span>🌊</span> VECTOR <span class="text-xs bg-cyan-900 text-cyan-300 px-2 py-1 rounded uppercase tracking-widest font-normal">AI Disaster Intelligence</span>
+            </h1>
+            <p class="text-xs text-slate-400 mt-1">Machine learning predictive modeling for urban flood early warning.</p>
+        </div>
+        <div class="bg-slate-900 border border-slate-700 px-4 py-2 rounded-lg text-sm font-mono text-cyan-300">
+            AI Simulation Step: <span id="step-counter" class="font-bold text-white">0</span>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-6 grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl mx-auto w-full">
+        
+        <!-- Left Panel: Controls & AI Stats -->
+        <div class="flex flex-col gap-6">
+            <div class="bg-slate-800 border border-slate-700 p-5 rounded-xl shadow-lg">
+                <h2 class="text-lg font-bold text-slate-200 mb-4 flex items-center gap-2"><span>⚙️</span> AI Parameters</h2>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-slate-300 mb-2">Rainfall Intensity (Magnitude): <span id="rainfall-val" class="text-cyan-400 font-bold">4.0</span> mm/hr</label>
+                    <input type="range" id="rainfall-slider" min="0.0" max="10.0" step="0.5" value="4.0" class="w-full accent-cyan-500 cursor-pointer">
+                </div>
+
+                <div class="flex gap-3 mt-6">
+                    <button id="btn-step" class="flex-1 bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2 px-4 rounded-lg shadow transition flex items-center justify-center gap-2">
+                        <span>⏩</span> Run AI Step
+                    </button>
+                    <button id="btn-reset" class="bg-slate-700 hover:bg-slate-600 text-slate-300 font-semibold py-2 px-4 rounded-lg shadow transition">
+                        🔄 Reset
+                    </button>
+                </div>
+            </div>
+
+            <!-- Summary Risk Cards -->
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-slate-800 border border-slate-700 p-4 rounded-xl">
+                    <p class="text-xs text-slate-400 uppercase font-semibold">Monitored Zones</p>
+                    <p id="total-regions" class="text-2xl font-black text-white mt-1">5</p>
+                </div>
+                <div class="bg-slate-800 border border-slate-700 p-4 rounded-xl">
+                    <p class="text-xs text-slate-400 uppercase font-semibold">Critical Alerts</p>
+                    <p id="critical-count" class="text-2xl font-black text-red-400 mt-1">0</p>
+                </div>
+            </div>
+
+            <!-- AI Insight Box -->
+            <div class="bg-slate-800 border border-slate-700 p-4 rounded-xl flex-1 flex flex-col justify-between">
+                <div>
+                    <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wide mb-2 flex items-center gap-2"><span>🤖</span> AI Model Intelligence</h3>
+                    <p id="ai-notice" class="text-xs text-slate-400 leading-relaxed">Model loaded: Random Forest Regressor equivalent. Analyzing elevation vectors and drainage friction coefficients.</p>
+                </div>
+                <div class="mt-4 pt-3 border-t border-slate-700 text-[10px] text-slate-500 font-mono">
+                    Hosting Status: <span class="text-emerald-400 font-bold">GitHub Pages Compatible (100% Client-Side)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Center/Right Panel: Map, Graph & Table -->
+        <div class="lg:col-span-2 flex flex-col gap-6">
+            
+            <!-- Top Row: Map & Graph Side-by-Side -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Map Container -->
+                <div class="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden shadow-lg flex flex-col h-[300px]">
+                    <div class="px-4 py-3 bg-slate-800 border-b border-slate-700">
+                        <span class="text-xs font-bold text-slate-200">🗺️ Spatial Flood Map</span>
+                    </div>
+                    <div id="map" class="flex-1 w-full z-10"></div>
+                </div>
+
+                <!-- The "Graph Thing" (Chart.js Trend Visualization) -->
+                <div class="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden shadow-lg flex flex-col h-[300px] p-4">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs font-bold text-slate-200">📈 AI Water Level Prediction Trend</span>
+                    </div>
+                    <div class="flex-1 relative">
+                        <canvas id="predictionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Region Table Container -->
+            <div class="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden shadow-lg flex-1">
+                <div class="px-4 py-3 bg-slate-800 border-b border-slate-700">
+                    <span class="text-sm font-bold text-slate-200">📊 Regional Vulnerability & AI Forecast</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-slate-900/50 text-slate-400 text-xs uppercase tracking-wider border-b border-slate-700">
+                                <th class="p-3">Region</th>
+                                <th class="p-3">Elevation</th>
+                                <th class="p-3">AI Predicted Water Level</th>
+                                <th class="p-3">Status</th>
+                                <th class="p-3">Time-to-Critical</th>
+                            </tr>
+                        </thead>
+                        <tbody id="region-table-body" class="divide-y divide-slate-700/50">
+                            <!-- Populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- JavaScript AI Simulation & UI Logic -->
+    <script>
+        // City Regions Data Model
+        let regions = [
+            { id: "R1", name: "North Hills", elevation: 45.0, drainage: 4.0, maxCap: 30.0, water: 0.0, lat: 12.9716, lon: 77.5946 },
+            { id: "R2", name: "Central Market", elevation: 20.0, drainage: 2.5, maxCap: 20.0, water: 0.0, lat: 12.9720, lon: 77.5956 },
+            { id: "R3", name: "Lowland Valley", elevation: 5.0, drainage: 1.0, maxCap: 15.0, water: 0.0, lat: 12.9730, lon: 77.5966 },
+            { id: "R4", name: "East Industrial", elevation: 25.0, drainage: 3.0, maxCap: 25.0, water: 0.0, lat: 12.9710, lon: 77.5976 },
+            { id: "R5", name: "Riverside Basin", elevation: 2.0, drainage: 0.5, maxCap: 12.0, water: 0.0, lat: 12.9700, lon: 77.5986 },
+        ];
+
+        let timeStep = 0;
+        let rainfallIntensity = 4.0;
+        let historicalTrend = { steps: [0], r3Levels: [0.0] };
+
+        // Initialize Leaflet Map
+        const map = L.map('map').setView([12.9716, 77.5946], 13);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            maxZoom: 19,
+            attribution: '&copy; CARTO'
+        }).addTo(map);
+        let markersLayer = L.layerGroup().addTo(map);
+
+        // Initialize Chart.js Graph ("The Graph Thing")
+        const ctx = document.getElementById('predictionChart').getContext('2d');
+        const predictionChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: historicalTrend.steps,
+                datasets: [{
+                    label: 'Lowland Valley Water Level (m)',
+                    data: historicalTrend.r3Levels,
+                    borderColor: '#22d3ee',
+                    backgroundColor: 'rgba(34, 211, 238, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } },
+                    x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } }
+                },
+                plugins: { legend: { labels: { color: '#cbd5e1', font: { size: 10 } } } }
+            }
+        });
+
+        // AI Simulation Step Function (Client-side Machine Learning logic mock)
+        function runAIStep() {
+            timeStep++;
+            let criticalCount = 0;
+
+            regions.forEach(r => {
+                // AI heuristic prediction formula based on elevation resistance and rainfall
+                let elevationFactor = Math.max(0.2, (50.0 - r.elevation) / 20.0);
+                let predictedInflow = (rainfallIntensity * elevationFactor) - r.drainage;
+                
+                r.water = Math.max(0.0, Math.min(r.maxCap, r.water + predictedInflow));
+
+                // Status classification
+                let ratio = r.water / r.maxCap;
+                if (ratio >= 1.0) {
+                    r.status = "Critical";
+                    criticalCount++;
+                } else if (ratio >= 0.7) {
+                    r.status = "Warning";
+                } else {
+                    r.status = "Safe";
+                }
+            });
+
+            // Track Lowland Valley (R3) for graph trend
+            let r3 = regions.find(r => r.id === "R3");
+            historicalTrend.steps.push(timeStep);
+            historicalTrend.r3Levels.push(parseFloat(r3.water.toFixed(2)));
+            if (historicalTrend.steps.length > 10) {
+                historicalTrend.steps.shift();
+                historicalTrend.r3Levels.shift();
+            }
+            predictionChart.update();
+
+            updateUI(criticalCount);
+        }
+
+        function resetSimulation() {
+            timeStep = 0;
+            regions.forEach(r => r.water = 0.0);
+            historicalTrend.steps = [0];
+            historicalTrend.r3Levels = [0.0];
+            predictionChart.update();
+            runAIStep();
+        }
+
+        function updateUI(criticalCount) {
+            document.getElementById('step-counter').innerText = timeStep;
+            document.getElementById('critical-count').innerText = criticalCount;
+
+            let tableHTML = "";
+            markersLayer.clearLayers();
+
+            regions.forEach(r => {
+                let badgeClass = "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
+                let pinColor = "#10b981";
+                if (r.status === "Warning") {
+                    badgeClass = "bg-amber-500/20 text-amber-300 border border-amber-500/30";
+                    pinColor = "#f59e0b";
+                } else if (r.status === "Critical") {
+                    badgeClass = "bg-red-500/20 text-red-300 border border-red-500/30 animate-pulse";
+                    pinColor = "#ef4444";
+                }
+
+                let timeToCrit = r.status === "Critical" ? 0 : Math.max(1, Math.round((r.maxCap - r.water) / Math.max(0.1, rainfallIntensity - r.drainage)));
+
+                tableHTML += `
+                    <tr class="hover:bg-slate-700/30 transition">
+                        <td class="p-3 font-medium text-white">${r.name} <span class="text-xs text-slate-400">(${r.id})</span></td>
+                        <td class="p-3 font-mono text-slate-300">${r.elevation}m</td>
+                        <td class="p-3 font-mono">${r.water.toFixed(2)} / ${r.maxCap}m</td>
+                        <td class="p-3"><span class="px-2.5 py-1 rounded-full text-xs font-semibold ${badgeClass}">${r.status}</span></td>
+                        <td class="p-3 font-mono text-slate-300">${r.status === "Critical" ? "Immediate" : timeToCrit + " steps"}</td>
+                    </tr>
+                `;
+
+                // Map marker
+                const circleMarker = L.circleMarker([r.lat, r.lon], {
+                    radius: Math.max(8, Math.min(25, r.water + 8)),
+                    color: pinColor,
+                    fillColor: pinColor,
+                    fillOpacity: 0.7,
+                    weight: 2
+                }).bindPopup(`<b>${r.name}</b><br>AI Status: ${r.status}<br>Water Level: ${r.water.toFixed(2)}m`);
+                markersLayer.addLayer(circleMarker);
+            });
+
+            document.getElementById('region-table-body').innerHTML = tableHTML;
+
+            const notice = document.getElementById('ai-notice');
+            if (criticalCount > 0) {
+                notice.innerText = `AI ALERT: ${criticalCount} zone(s) predicted to breach flood capacity. Evacuation vectors activated.`;
+                notice.className = "text-xs text-red-400 font-semibold leading-relaxed";
+            } else {
+                notice.innerText = `AI Model Stable. Rainfall set to ${rainfallIntensity} mm/hr. Elevation runoffs routing normally.`;
+                notice.className = "text-xs text-slate-400 leading-relaxed";
+            }
+        }
+
+        // Event Listeners
+        document.getElementById('btn-step').addEventListener('click', runAIStep);
+        document.getElementById('btn-reset').addEventListener('click', resetSimulation);
+
+        const slider = document.getElementById('rainfall-slider');
+        slider.addEventListener('input', (e) => {
+            rainfallIntensity = parseFloat(e.target.value);
+            document.getElementById('rainfall-val').innerText = rainfallIntensity;
+        });
+
+        // Initial run
+        runAIStep();
+    </script>
+</body>
+</html>
